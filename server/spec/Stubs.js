@@ -25,11 +25,11 @@ module.exports = {
     this.setEncoding = function() { /* noop */ };
 
     this.addListener = this.on = function(type, callback) {
-      if (type == 'data') {
+      if (type === 'data') {
         callback(JSON.stringify(this._postData));
       }
 
-      if (type == 'end') {
+      if (type === 'end') {
         callback();
       }
 

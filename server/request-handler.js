@@ -1,3 +1,7 @@
+/*
+create data base structure for our messages
+handle url queries
+
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -11,16 +15,21 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var querystring = require('querystring');
-var body
 
-var data = {};
-data.results = [];
-var message = {
-  name : "avi",
-  message: "hello"
-};
-data.results.push(message);
+var querystring = require('querystring');
+var data = require('./messages.js').data;
+var body;
+if (!String.prototype.startsWith) {
+  Object.defineProperty(String.prototype, 'startsWith', {
+    enumerable: false,
+    configurable: false,
+    writable: false,
+    value: function(searchString, position) {
+      position = position || 0;
+      return this.lastIndexOf(searchString, position) === position;
+    }
+  });
+}
 
 var requestHandler = function(request, response) {
   console.log("Serving request type " + request.method + " for url " + request.url);
@@ -29,15 +38,28 @@ var requestHandler = function(request, response) {
 
   headers['Content-Type'] = "text/plain";
   var responseMessage = '';
+  if(request.method === 'OPTIONS'){
 
-  if(request.url === '/classes/messages' && request.method === 'GET'){
+    var headers = {};
+    // IE8 does not allow domains to be specified, just the *
+    // headers["Access-Control-Allow-Origin"] = req.headers.origin;
+    headers["Access-Control-Allow-Origin"] = "*";
+    headers["Access-Control-Allow-Methods"] = "POST, GET, PUT, DELETE, OPTIONS";
+    headers["Access-Control-Allow-Credentials"] = false;
+    headers["Access-Control-Max-Age"] = '86400'; // 24 hours
+    headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept";
+    response.writeHead(200, headers);
+    response.end();
+
+  } else if((request.url.startsWith('/classes/messages') || request.url === '/classes/room1') && request.method === 'GET'){
+
     responseMessage = data;
     headers['Content-Type'] = "application/JSON";
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(responseMessage));
-  }
 
-  if(request.url === '/classes/messages' && request.method === 'POST'){
+  } else if((request.url.startsWith('/classes/messages') || request.url === '/classes/room1') && request.method === 'POST'){
+
     var body = '';
       request.on('data', function(data){
       body += data;
@@ -48,13 +70,19 @@ var requestHandler = function(request, response) {
       var msg;
       for(var key in body){
         msg = JSON.parse(key);
-        data.results.unshift(msg);
+        data.add(msg.username, msg.text);
       }
-      console.log(data);
       statusCode = 201;
       response.writeHead(statusCode, headers);
       response.end(JSON.stringify(responseMessage));
     });
+
+  } else {
+
+    statusCode = 404;
+    response.writeHead(statusCode, headers);
+    response.end('');
+
   }
 
 };
