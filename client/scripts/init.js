@@ -34,7 +34,8 @@ var renderAll = function() {
     merge: true,
     reset: false,
     data: getData,
-    success: function() {
+    success: function(data) {
+      console.log(data);
       rv.render();
     }
   });

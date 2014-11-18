@@ -88,11 +88,19 @@ var requestHandler = function(request, response) {
     });
 
   } else {
-
-    statusCode = 404;
-    response.writeHead(statusCode, headers);
-    response.end('');
-
+    console.log(request.url);
+    fs.readFile('../client' + request.url, function(err, data) {
+      if(err){
+        statusCode = 404;
+        response.writeHead(statusCode, headers);
+        response.end('');
+      } else {
+        //check to see the type of file
+        response.writeHead(200, {'Content-Type': 'text/css', 'Content-Length':data.length});
+        response.write(data);
+        response.end();
+      }
+    })
   }
 
 };
