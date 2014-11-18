@@ -18,7 +18,9 @@ this file and include it in basic-server.js so that it actually works.
 
 var querystring = require('querystring');
 var data = require('./messages.js').data;
+var fs = require('fs');
 var body;
+
 if (!String.prototype.startsWith) {
   Object.defineProperty(String.prototype, 'startsWith', {
     enumerable: false,
@@ -51,7 +53,15 @@ var requestHandler = function(request, response) {
     response.writeHead(200, headers);
     response.end();
 
-  } else if((request.url.startsWith('/classes/messages') || request.url === '/classes/room1') && request.method === 'GET'){
+  } else if(request.url === '/'){
+
+    fs.readFile('../client/index.html', function(err, data){
+      response.writeHead(200, {'Content-Type': 'text/html', 'Content-Length':data.length});
+      response.write(data);
+      response.end();
+    });
+
+  }else if((request.url.startsWith('/classes/messages') || request.url === '/classes/room1') && request.method === 'GET'){
 
     responseMessage = data;
     headers['Content-Type'] = "application/JSON";
