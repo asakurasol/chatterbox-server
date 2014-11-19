@@ -20,6 +20,7 @@ app.get('/classes/messages', function(req, res) {
 //post messages
 
 var jsonParser = bodyParser.json();
+
 app.post('/classes/messages', jsonParser, function(req, res) {
   data.add(req.body.username, req.body.text);
   res.end();
