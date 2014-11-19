@@ -1,4 +1,5 @@
 var data = require('./messages.js').data;
+var fs = require('fs');
 
 var headers = {
   "access-control-allow-origin": "*",
@@ -14,13 +15,14 @@ var sendResponse = function(response, statusCode, data) {
   response.end(JSON.stringify(data));
 };
 
-var loadFile = function(response, url) {
+var loadFile = function(response, url, fileType) {
+  fileType = fileType || 'css';
   fs.readFile('../client'+url, function(err, data){
     if(err){
       response.writeHead(404, headers);
       response.end('');
     } else {
-      response.writeHead(200, {'Content-Type': 'text/html', 'Content-Length':data.length});
+      response.writeHead(200, {'Content-Type': 'text/'+fileType, 'Content-Length':data.length});
       response.write(data);
       response.end();
     }

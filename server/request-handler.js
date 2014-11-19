@@ -1,6 +1,5 @@
-var querystring = require('querystring');
 var data = require('./messages.js').data;
-var fs = require('fs');
+
 var util = require('./util.js');
 
 var requestHandler = function(request, response) {
